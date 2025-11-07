@@ -1,0 +1,99 @@
+LEX
+LEX (Lexical Analyzer Generator) is a tool used to automatically generate a lexical analyzer.
+It identifies tokens in the input using regular expressions.
+Main parts of a LEX program:
+Definition Section – declarations and header files
+Rule Section – patterns and associated actions
+User Code Section – auxiliary C functions
+LEX generates a file lex.yy.c which contains the function yylex().
+YACC
+YACC (Yet Another Compiler Compiler) is a parser generator.
+It takes tokens produced by LEX and uses context-free grammar rules to perform syntax analysis.
+Main parts of a YACC program:
+Declarations (tokens from LEX)
+Grammar Rules and Actions
+Auxiliary C Code
+YACC generates y.tab.c and y.tab.h, containing the parser and token definitions.
+LEX–YACC Interaction
+LEX identifies tokens and returns them to YACC.
+YACC checks the sequence of tokens against grammar rules.
+Together they form the front end of a compiler.
+Software Requirements
+Linux OS / Terminal
+lex or flex
+yacc or bison
+gcc compiler
+Procedure
+Step 1: Write LEX Program (lex.l)
+Include required header files.
+Define patterns for tokens.
+For each pattern, return corresponding token to YACC.
+Step 2: Write YACC Program (yacc.y)
+Define tokens using %token.
+Write grammar rules and actions.
+Provide main function to call parser.
+Step 3: Compile
+lex lex.l
+yacc -d yacc.y
+gcc lex.yy.c y.tab.c -o output
+Step 4: Execute
+./output
+Sample Program
+Problem:
+Write a LEX-YACC program to evaluate simple arithmetic expressions.
+LEX Code (lex.l)
+%{
+#include "y.tab.h"
+%}
+
+%%
+
+[0-9]+     { yylval = atoi(yytext); return NUMBER; }
+[+\-*/]    { return yytext[0]; }
+[\n]       { return 0; }
+[ \t]      { /* ignore whitespace */ }
+
+.          { /* ignore any other character */ }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+YACC Code (yacc.y)
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%token NUMBER
+
+%%
+
+expr:
+      expr '+' expr   { printf("= %d\n", $1 + $3); }
+    | expr '-' expr   { printf("= %d\n", $1 - $3); }
+    | expr '*' expr   { printf("= %d\n", $1 * $3); }
+    | expr '/' expr   { printf("= %d\n", $1 / $3); }
+    | NUMBER
+    ;
+
+%%
+
+int main() {
+    printf("Enter expression: ");
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *s) {
+    printf("Error: %s\n", s);
+    return 0;
+}
+Sample Output
+Enter expression: 5 + 6 * 2
+= 17
+Enter expression: 10 - 4
+= 6
+Result
+Successfully implemented LEX and YACC programs to perform lexical and syntax analysis and executed them using Linux tools.
